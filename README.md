@@ -23,7 +23,7 @@ This project uses a Raspberry Pi with an OLED LCD HAT to display real-time trans
 
 1. Clone this repository:
    ```
-   git clone https://github.com/yourusername/rpi-transit-weather-display.git
+   git clone https://github.com/LucaIcaro/rpi-transit-weather-display.git
    cd rpi-transit-weather-display
    ```
 
