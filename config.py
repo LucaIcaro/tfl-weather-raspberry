@@ -1,7 +1,13 @@
-# Existing TfL API details
-API_KEY = 'XXXXXXXXXX'
-BUS_STOP_ID = 'XXXXXXXXXX'
-OVERGROUND_STATION_ID = 'XXXXXXXXXX'
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# TfL API details
+API_KEY = os.getenv('TFL_API_KEY')
+BUS_STOP_ID = os.getenv('BUS_STOP_ID')
+OVERGROUND_STATION_ID = os.getenv('OVERGROUND_STATION_ID')
 BUS_URL = f'https://api.tfl.gov.uk/StopPoint/{BUS_STOP_ID}/Arrivals'
 OVERGROUND_URL = f'https://api.tfl.gov.uk/StopPoint/{OVERGROUND_STATION_ID}/Arrivals'
 UNDERGROUND_URL = 'https://api.tfl.gov.uk/line/mode/tube/status'
@@ -9,12 +15,12 @@ UNDERGROUND_URL = 'https://api.tfl.gov.uk/line/mode/tube/status'
 # Weather API details
 WEATHER_URL = "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/hourly"
 WEATHER_PARAMS = {
-    "latitude": 50,
-    "longitude": 0
+    "latitude": float(os.getenv('WEATHER_LATITUDE')),
+    "longitude": float(os.getenv('WEATHER_LONGITUDE'))
 }
 WEATHER_HEADERS = {
     "accept": "application/json",
-    "apikey": "XXXXXXXXXX"  # Replace with your actual API key
+    "apikey": os.getenv('WEATHER_API_KEY')
 }
 
 # Set up colors

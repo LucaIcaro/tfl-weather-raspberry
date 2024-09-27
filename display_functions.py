@@ -38,19 +38,55 @@ def draw_main_screen():
     pygame.display.flip()
     state.main_need_redraw = False
 
-def draw_weather_screen():
+def wrap_text(text, font, max_width):
+    words = text.split()
+    lines = []
+    current_line = []
+    for word in words:
+        test_line = ' '.join(current_line + [word])
+        if font.getlength(test_line) <= max_width:
+            current_line.append(word)
+        else:
+            lines.append(' '.join(current_line))
+            current_line = [word]
+    if current_line:
+        lines.append(' '.join(current_line))
+    return lines
+
+def draw_weather_screens():
     if not state.weather_need_redraw:
         return
 
-    with canvas(state.oled_device) as draw:
-        draw.text((0, 0), "Weather Forecast", font=state.OLED_FONT, fill="white")
-        
+    weather_data = state.weather_data_today if state.weather_display_day == 0 else state.weather_data_tomorrow
+    day_str = "Today" if state.weather_display_day == 0 else "Tomorrow"
+
+    # First OLED screen (0x3C)
+    with canvas(state.oled_device_3c) as draw:
+        draw.text((0, 0), f"{day_str}'s Weather", font=state.OLED_FONT, fill="white")
+
         y_offset = 16
-        for line in state.weather_data:
+        for line in weather_data[:3]:  # Display first 3 lines on this screen
             draw.text((0, y_offset), line, font=state.OLED_SMALL_FONT, fill="white")
-            y_offset += 12  # Increased line spacing for better readability
-        
+            y_offset += 12
+
         update_time = time.strftime("%H:%M", time.localtime(state.weather_last_update_time))
         draw.text((0, 54), f"Updated: {update_time}", font=state.OLED_SMALL_FONT, fill="white")
+
+    # Second OLED screen (0x3D)
+    with canvas(state.oled_device_3d) as draw:
+        if len(weather_data) > 3:
+            draw.text((0, 0), f"{day_str} (cont.)", font=state.OLED_FONT, fill="white")
+
+            y_offset = 16
+            for line in weather_data[3:]:  # Display remaining lines on this screen
+                draw.text((0, y_offset), line, font=state.OLED_SMALL_FONT, fill="white")
+                y_offset += 12
+                if y_offset >= 54:  # Stop if we're about to overlap with the bottom of the screen
+                    break
+        else:
+            draw.text((0, 0), f"{day_str}'s Weather", font=state.OLED_FONT, fill="white")
+            draw.text((0, 16), "No precipitation", font=state.OLED_SMALL_FONT, fill="white")
+            draw.text((0, 28), "or extreme weather", font=state.OLED_SMALL_FONT, fill="white")
+            draw.text((0, 40), "expected", font=state.OLED_SMALL_FONT, fill="white")
 
     state.weather_need_redraw = False
